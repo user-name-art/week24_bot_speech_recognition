@@ -11,6 +11,7 @@ env.read_env()
 
 PROJECT_ID = env.str('GOOGLE_PROJECT_ID')
 SESSION_ID = env.str('TG_USER_ID')
+LANGUAGE_CODE = 'ru-RU'
 
 # Enable logging
 logging.basicConfig(
@@ -41,7 +42,12 @@ def echo(update: Update, context: CallbackContext) -> None:
 
 
 def smart_answer(update: Update, context: CallbackContext) -> None:
-    smart_answer = detect_intent_texts(PROJECT_ID, SESSION_ID, update.message.text, 'ru-RU')
+    smart_answer = detect_intent_texts(
+        PROJECT_ID,
+        SESSION_ID,
+        update.message.text,
+        LANGUAGE_CODE
+    )
     update.message.reply_text(smart_answer)
 
 
