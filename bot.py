@@ -1,37 +1,26 @@
-#!/usr/bin/env python
-# pylint: disable=C0116,W0613
-# This program is dedicated to the public domain under the CC0 license.
-
-"""
-Simple Bot to reply to Telegram messages.
-
-First, a few handler functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
-Then, the bot is started and runs until we press Ctrl-C on the command line.
-
-Usage:
-Basic Echobot example, repeats messages.
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
-"""
-
 import logging
 
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from environs import Env
+from utils import detect_intent_texts
 
+
+env = Env()
+env.read_env()
+
+PROJECT_ID = env.str('GOOGLE_PROJECT_ID')
+SESSION_ID = env.str('TG_USER_ID')
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
 )
 
 logger = logging.getLogger(__name__)
 
 
-# Define a few command handlers. These usually take the two arguments update and
-# context.
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
@@ -51,12 +40,14 @@ def echo(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(update.message.text)
 
 
+def smart_answer(update: Update, context: CallbackContext) -> None:
+    smart_answer = detect_intent_texts(PROJECT_ID, SESSION_ID, update.message.text, 'ru-RU')
+    update.message.reply_text(smart_answer)
+
+
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    env = Env()
-    env.read_env()
-
     bot_token = env.str('TG_BOT_TOKEN')
     updater = Updater(bot_token)
 
@@ -68,7 +59,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("help", help_command))
 
     # on non command i.e message - echo the message on Telegram
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, smart_answer))
 
     # Start the Bot
     updater.start_polling()
