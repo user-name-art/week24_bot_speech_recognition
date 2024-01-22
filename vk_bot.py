@@ -2,6 +2,14 @@ from environs import Env
 import random
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
+from utils import detect_intent_texts
+
+env = Env()
+env.read_env()
+
+vk_token = env.str('VK_TOKEN')
+PROJECT_ID = env.str('GOOGLE_PROJECT_ID')
+LANGUAGE_CODE = 'ru-RU'
 
 
 def echo(event, vk_api):
@@ -12,11 +20,21 @@ def echo(event, vk_api):
     )
 
 
-if __name__ == '__main__':
-    env = Env()
-    env.read_env()
+def smart_answer(event, vk_api):
+    smart_answer = detect_intent_texts(
+        PROJECT_ID,
+        event.user_id,
+        event.text,
+        LANGUAGE_CODE
+    )
+    vk_api.messages.send(
+        user_id=event.user_id,
+        message=smart_answer,
+        random_id=random.randint(1, 1000)
+    )
 
-    vk_token = env.str('VK_TOKEN')
+
+if __name__ == '__main__':
     vk_session = vk_api.VkApi(token=vk_token)
 
     vk_api = vk_session.get_api()
@@ -24,4 +42,4 @@ if __name__ == '__main__':
 
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            echo(event, vk_api)
+            smart_answer(event, vk_api)
