@@ -31,18 +31,8 @@ def start(update: Update, context: CallbackContext) -> None:
     )
 
 
-def help_command(update: Update, context: CallbackContext) -> None:
-    """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
-
-
-def echo(update: Update, context: CallbackContext) -> None:
-    """Echo the user message."""
-    update.message.reply_text(update.message.text)
-
-
 def smart_answer(update: Update, context: CallbackContext) -> None:
-    smart_answer = detect_intent_texts(
+    question_is_unclear, smart_answer = detect_intent_texts(
         PROJECT_ID,
         SESSION_ID,
         update.message.text,
@@ -61,8 +51,7 @@ def main() -> None:
     dispatcher = updater.dispatcher
 
     # on different commands - answer in Telegram
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("help", help_command))
+    dispatcher.add_handler(CommandHandler('start', start))
 
     # on non command i.e message - echo the message on Telegram
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, smart_answer))
