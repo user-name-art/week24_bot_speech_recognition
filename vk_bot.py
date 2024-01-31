@@ -21,17 +21,18 @@ def echo(event, vk_api):
 
 
 def smart_answer(event, vk_api):
-    smart_answer = detect_intent_texts(
+    question_is_unclear, smart_answer = detect_intent_texts(
         PROJECT_ID,
         event.user_id,
         event.text,
         LANGUAGE_CODE
     )
-    vk_api.messages.send(
-        user_id=event.user_id,
-        message=smart_answer,
-        random_id=random.randint(1, 1000)
-    )
+    if not question_is_unclear:
+        vk_api.messages.send(
+            user_id=event.user_id,
+            message=smart_answer,
+            random_id=random.randint(1, 1000)
+        )
 
 
 if __name__ == '__main__':
