@@ -58,7 +58,7 @@ def smart_answer(update: Update, context: CallbackContext) -> None:
 
 def main() -> None:
     updater = Updater(BOT_TOKEN)
-    logger.info('bot started')
+    logger.info('tg bot started')
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler('start', start))
