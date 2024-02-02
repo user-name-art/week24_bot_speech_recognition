@@ -2,6 +2,10 @@
 
 Боты для **Telegram** и **VK**, которые умеют распознавать вопросы от пользователей и отвечать на них. Боты работают на базе облачного сервиса **DialogFlow**, который представляет собой платформу для понимания естественного языка с возможностью обучения и интеграции диалогового пользовательского интерфейса в другие приложения.
 
+![Record_2024-02-02-17-40-52](https://github.com/user-name-art/week24_bot_speech_recognition/assets/112713337/5b7b73bd-758a-4fdd-b668-8f55ed9eb79b)
+
+![Record_2024-02-02-17-44-03](https://github.com/user-name-art/week24_bot_speech_recognition/assets/112713337/7b829921-fb0c-4620-afef-f3f9a432656f)
+
 Примеры ботов:
 * [Telegram](https://t.me/art_2024_speech_recognition_bot)
 * Сообщество [VK](https://vk.com/club224363232)
