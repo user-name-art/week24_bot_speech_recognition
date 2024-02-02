@@ -1,4 +1,5 @@
 import logging
+import telegram
 
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
@@ -6,20 +7,30 @@ from environs import Env
 from utils import detect_intent_texts
 
 
+class TelegramLogsHandler(logging.Handler):
+
+    def __init__(self, bot_token, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.bot_token = bot_token
+        self.tg_bot = telegram.Bot(token=bot_token)
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
+
+
 env = Env()
 env.read_env()
 
+LANGUAGE_CODE = 'ru-RU'
 PROJECT_ID = env.str('GOOGLE_PROJECT_ID')
 SESSION_ID = env.str('TG_USER_ID')
-LANGUAGE_CODE = 'ru-RU'
+BOT_TOKEN = env.str('TG_BOT_TOKEN')
 
-# Enable logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('Logger')
+logger.setLevel(logging.INFO)
+logger.addHandler(TelegramLogsHandler(BOT_TOKEN, SESSION_ID))
 
 
 def start(update: Update, context: CallbackContext) -> None:
@@ -32,36 +43,30 @@ def start(update: Update, context: CallbackContext) -> None:
 
 
 def smart_answer(update: Update, context: CallbackContext) -> None:
-    question_is_unclear, smart_answer = detect_intent_texts(
-        PROJECT_ID,
-        SESSION_ID,
-        update.message.text,
-        LANGUAGE_CODE
-    )
-    update.message.reply_text(smart_answer)
+    try:
+        question_is_unclear, smart_answer = detect_intent_texts(
+            PROJECT_ID,
+            SESSION_ID,
+            update.message.text,
+            LANGUAGE_CODE
+        )
+        update.message.reply_text(smart_answer)
+    except Exception as err:
+        logger.error('У Telegram-бота возникла следующая ошибка:')
+        logger.exception(err)
 
 
 def main() -> None:
-    """Start the bot."""
-    # Create the Updater and pass it your bot's token.
-    bot_token = env.str('TG_BOT_TOKEN')
-    updater = Updater(bot_token)
-
-    # Get the dispatcher to register handlers
+    updater = Updater(BOT_TOKEN)
+    logger.info('bot started')
     dispatcher = updater.dispatcher
 
-    # on different commands - answer in Telegram
     dispatcher.add_handler(CommandHandler('start', start))
 
-    # on non command i.e message - echo the message on Telegram
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, smart_answer))
 
-    # Start the Bot
     updater.start_polling()
 
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
 
 
