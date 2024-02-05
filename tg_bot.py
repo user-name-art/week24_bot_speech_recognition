@@ -1,23 +1,10 @@
 import logging
-import telegram
 
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from environs import Env
 from google_dialogflow_api import detect_intent_texts
-
-
-class TelegramLogsHandler(logging.Handler):
-
-    def __init__(self, bot_token, chat_id):
-        super().__init__()
-        self.chat_id = chat_id
-        self.bot_token = bot_token
-        self.tg_bot = telegram.Bot(token=bot_token)
-
-    def emit(self, record):
-        log_entry = self.format(record)
-        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
+from log_handler import TelegramLogsHandler
 
 
 env = Env()
