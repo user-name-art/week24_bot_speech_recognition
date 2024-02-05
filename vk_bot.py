@@ -8,18 +8,12 @@ from google_dialogflow_api import detect_intent_texts
 from log_handler import TelegramLogsHandler
 
 
-env = Env()
-env.read_env()
-
-PROJECT_ID = env.str('GOOGLE_PROJECT_ID')
 LANGUAGE_CODE = 'ru-RU'
-SESSION_ID = env.str('TG_USER_ID')
-BOT_TOKEN = env.str('TG_BOT_TOKEN')
 
 
-def answer_to_message(event, vk_api):
+def answer_to_message(event, vk_api, project_id):
     question_is_unclear, smart_answer = detect_intent_texts(
-        PROJECT_ID,
+        project_id,
         event.user_id,
         event.text,
         LANGUAGE_CODE
@@ -33,9 +27,16 @@ def answer_to_message(event, vk_api):
 
 
 if __name__ == '__main__':
+    env = Env()
+    env.read_env()
+
+    project_id = env.str('GOOGLE_PROJECT_ID')
+    admin_session_id = env.str('TG_ADMIN_ID')
+    bot_token = env.str('TG_BOT_TOKEN')
+
     logger = logging.getLogger('Logger')
     logger.setLevel(logging.INFO)
-    logger.addHandler(TelegramLogsHandler(BOT_TOKEN, SESSION_ID))
+    logger.addHandler(TelegramLogsHandler(bot_token, admin_session_id))
 
     vk_token = env.str('VK_TOKEN')
     vk_session = vk_api.VkApi(token=vk_token)
@@ -48,7 +49,7 @@ if __name__ == '__main__':
 
             for event in longpoll.listen():
                 if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                    answer_to_message(event, vk_api)
+                    answer_to_message(event, vk_api, project_id)
         except Exception as err:
             logger.error('У VK-бота возникла следующая ошибка:')
             logger.exception(err)

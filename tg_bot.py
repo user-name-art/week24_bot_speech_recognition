@@ -5,19 +5,12 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 from environs import Env
 from google_dialogflow_api import detect_intent_texts
 from log_handler import TelegramLogsHandler
+from functools import partial
 
-
-env = Env()
-env.read_env()
-
-LANGUAGE_CODE = 'ru-RU'
-PROJECT_ID = env.str('GOOGLE_PROJECT_ID')
-SESSION_ID = env.str('TG_USER_ID')
-BOT_TOKEN = env.str('TG_BOT_TOKEN')
 
 logger = logging.getLogger('Logger')
-logger.setLevel(logging.INFO)
-logger.addHandler(TelegramLogsHandler(BOT_TOKEN, SESSION_ID))
+
+LANGUAGE_CODE = 'ru-RU'
 
 
 def start(update: Update, context: CallbackContext) -> None:
@@ -29,11 +22,12 @@ def start(update: Update, context: CallbackContext) -> None:
     )
 
 
-def answer_to_message(update: Update, context: CallbackContext) -> None:
+def answer_to_message(update: Update, context: CallbackContext, project_id) -> None:
     try:
+        session_id = update.message.from_user.id
         question_is_unclear, smart_answer = detect_intent_texts(
-            PROJECT_ID,
-            SESSION_ID,
+            project_id,
+            session_id,
             update.message.text,
             LANGUAGE_CODE
         )
@@ -44,13 +38,28 @@ def answer_to_message(update: Update, context: CallbackContext) -> None:
 
 
 def main() -> None:
-    updater = Updater(BOT_TOKEN)
+    env = Env()
+    env.read_env()
+
+    bot_token = env.str('TG_BOT_TOKEN')
+    project_id = env.str('GOOGLE_PROJECT_ID')
+    admin_session_id = env.str('TG_ADMIN_ID')
+
+    logger.setLevel(logging.INFO)
+    logger.addHandler(TelegramLogsHandler(bot_token, admin_session_id))
+
+    updater = Updater(bot_token)
     logger.info('tg bot started')
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler('start', start))
 
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, answer_to_message))
+    dispatcher.add_handler(
+        MessageHandler(
+            Filters.text & ~Filters.command,
+            partial(answer_to_message, project_id=project_id)
+        )
+    )
 
     updater.start_polling()
 
