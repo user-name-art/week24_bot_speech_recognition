@@ -5,7 +5,7 @@ import logging
 
 from environs import Env
 from vk_api.longpoll import VkLongPoll, VkEventType
-from utils import detect_intent_texts
+from google_dialogflow_api import detect_intent_texts
 
 
 class TelegramLogsHandler(logging.Handler):
@@ -30,7 +30,7 @@ SESSION_ID = env.str('TG_USER_ID')
 BOT_TOKEN = env.str('TG_BOT_TOKEN')
 
 
-def smart_answer(event, vk_api):
+def get_answer_from_dialogflow(event, vk_api):
     question_is_unclear, smart_answer = detect_intent_texts(
         PROJECT_ID,
         event.user_id,

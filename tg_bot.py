@@ -4,7 +4,7 @@ import telegram
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from environs import Env
-from utils import detect_intent_texts
+from google_dialogflow_api import detect_intent_texts
 
 
 class TelegramLogsHandler(logging.Handler):
