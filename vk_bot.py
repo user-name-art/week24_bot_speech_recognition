@@ -12,9 +12,10 @@ LANGUAGE_CODE = 'ru-RU'
 
 
 def answer_to_message(event, vk_api, project_id):
+    vk_user_id = f'vk_{event.user_id}'
     question_is_unclear, smart_answer = detect_intent_texts(
         project_id,
-        event.user_id,
+        vk_user_id,
         event.text,
         LANGUAGE_CODE
     )

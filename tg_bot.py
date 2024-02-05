@@ -24,10 +24,10 @@ def start(update: Update, context: CallbackContext) -> None:
 
 def answer_to_message(update: Update, context: CallbackContext, project_id) -> None:
     try:
-        session_id = update.message.from_user.id
+        tg_session_id = f'tg_{update.message.from_user.id}'
         question_is_unclear, smart_answer = detect_intent_texts(
             project_id,
-            session_id,
+            tg_session_id,
             update.message.text,
             LANGUAGE_CODE
         )
