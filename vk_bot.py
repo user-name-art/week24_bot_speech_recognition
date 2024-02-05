@@ -30,7 +30,7 @@ SESSION_ID = env.str('TG_USER_ID')
 BOT_TOKEN = env.str('TG_BOT_TOKEN')
 
 
-def get_answer_from_dialogflow(event, vk_api):
+def answer_to_message(event, vk_api):
     question_is_unclear, smart_answer = detect_intent_texts(
         PROJECT_ID,
         event.user_id,
@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
             for event in longpoll.listen():
                 if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                    smart_answer(event, vk_api)
+                    answer_to_message(event, vk_api)
         except Exception as err:
             logger.error('У VK-бота возникла следующая ошибка:')
             logger.exception(err)

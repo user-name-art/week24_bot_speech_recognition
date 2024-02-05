@@ -42,7 +42,7 @@ def start(update: Update, context: CallbackContext) -> None:
     )
 
 
-def smart_answer(update: Update, context: CallbackContext) -> None:
+def answer_to_message(update: Update, context: CallbackContext) -> None:
     try:
         question_is_unclear, smart_answer = detect_intent_texts(
             PROJECT_ID,
@@ -63,7 +63,7 @@ def main() -> None:
 
     dispatcher.add_handler(CommandHandler('start', start))
 
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, smart_answer))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, answer_to_message))
 
     updater.start_polling()
 
