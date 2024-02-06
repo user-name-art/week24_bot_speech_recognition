@@ -31,7 +31,7 @@ pip install -r requirements.txt
 * **GOOGLE_PROJECT_ID** идентификатор проекта в DialogFlow. Подробнее в документации [Google Cloud](https://cloud.google.com/dialogflow/docs/quick/setup).
 * **GOOGLE_APPLICATION_CREDENTIALS** путь до json-файла с ключами от Google. Подробнее в документации [Google Cloud](https://cloud.google.com/docs/authentication/api-keys). 
 * **TG_BOT_TOKEN** токен Telegram-бота.
-* **TG_CHAT** chat_id пользователя в Telegram. Можно узнать, написав в Telegram специальному боту [@userinfobot](https://telegram.me/userinfobot).
+* **TG_ADMIN_ID** id пользователя в Telegram, который будет получать логи об ошибках ботов. Можно узнать, написав в Telegram специальному боту [@userinfobot](https://telegram.me/userinfobot).
 *  **VK_TOKEN** токен бота ВКонтакте.
 
 Боты запускаются по-отдельности соответствующими скриптами:
@@ -42,7 +42,7 @@ python tg_bot.py
 ```
 python vk_bot.py
 ```
-Также есть скрипт **dialogflow_learning_script** для обучения DialogFlow с помощью заранее заготовленных фраз. Для этого понадобится создать в папке со скриптом файл questions.json следующего вида:
+Также есть скрипт **dialogflow_learning_script** для обучения DialogFlow с помощью заранее заготовленных фраз. Для этого понадобится создать json-файл следующего вида:
 ```
 {
     "Устройство на работу": {
@@ -73,6 +73,10 @@ python vk_bot.py
         "answer": "Если вы не можете войти на сайт, воспользуйтесь кнопкой «Забыли пароль?» под формой входа. Вам на почту прийдёт письмо с дальнейшими инструкциями. Проверьте папку «Спам», иногда письма попадают в неё."
     }
 }
+```
+По умолчанию скрипт ищет файл questions.json в папке со скриптом. При необходимости вы можете передать путь к файлу в качестве аргумента при запуске. Например: 
+```
+python dialogflow_learning_script.py /home/user/projects/q.json
 ```
 
 После этого можно запустить скрипт:

@@ -1,4 +1,5 @@
 import json
+import argparse
 from google.cloud import dialogflow
 from environs import Env
 
@@ -31,15 +32,31 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
     print('Intent created: {}'.format(response))
 
 
-if __name__ == '__main__':
+def main():
     env = Env()
     env.read_env()
 
     project_id = env.str('GOOGLE_PROJECT_ID')
 
-    with open('questions.json', 'r') as file:
-        questions_json = file.read()
+    parser = argparse.ArgumentParser(description='Скрипт передает в DialogFlow данные для обучения.')
+    parser.add_argument(
+        'file',
+        nargs='?',
+        default='questions.json',
+        help='путь к файлу с данными; если не указан - скрипт ищет questions.json в той же папке, где находится сам.'
+    )
+    file = parser.parse_args().file
 
-    learning_texts = json.loads(questions_json)
-    for subject, dialog in learning_texts.items():
-        create_intent(project_id, subject, dialog['questions'], [dialog['answer']])
+    try:
+        with open(file, 'r') as f:
+            questions_json = f.read()
+
+        learning_texts = json.loads(questions_json)
+        for subject, dialog in learning_texts.items():
+            create_intent(project_id, subject, dialog['questions'], [dialog['answer']])
+    except Exception as err:
+        print(err)
+
+
+if __name__ == '__main__':
+    main()
